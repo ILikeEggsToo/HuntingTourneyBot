@@ -427,12 +427,12 @@ class MyClient(discord.Client):
         # Role Check
         has_role = False
         for role in getattr(message.author, "roles", []):
-            if role.name == "HUNTING DRAFTER":
+            if role.name.lower() == "hunting drafter":
                 has_role = True
                 break
         if not has_role:
             await message.channel.send(
-                "You need the HUNTING DRAFTER role to use this command."
+                "You need the Hunting Drafter role to use this command."
             )
             return
 
