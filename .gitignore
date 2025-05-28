@@ -2,3 +2,6 @@
 draft_status.txt
 token.txt
 .output
+build
+dist
+*.spec
