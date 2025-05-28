@@ -132,7 +132,14 @@ class DraftManager:
         remaining_stages = [
             stage for stage in STAGE_NAMES if stage not in self.banned_stages
         ]
-        shuffle(remaining_stages)  # Shuffle the remaining stages
+        shuffle(remaining_stages)
+        if remaining_stages and remaining_stages[0] == "Security Hall":
+            # If Security Hall is first, swap it with another random stage
+            swap_idx = randint(1, len(remaining_stages) - 1)
+            remaining_stages[0], remaining_stages[swap_idx] = (
+                remaining_stages[swap_idx],
+                remaining_stages[0],
+            )
 
         for i, stage in enumerate(remaining_stages):
             if stage in stage_abbrs:
@@ -538,6 +545,8 @@ class MyClient(discord.Client):
             print(f"\n{banner} banned {full_stage_name}")
             print(f"Now waiting for {next_banner}'s ban...")
         else:
+            print(f"\n{banner} banned {full_stage_name}")
+
             # Conclude the draft
             self.draft_manager.output_lines[0] = "Draft concluded"
             self.draft_manager.write_draft_status()
@@ -572,7 +581,6 @@ class MyClient(discord.Client):
             # Reset the draft status
             self.draft_manager.waiting_for_ban2 = False
             self.draft_manager.draft_active = False
-            print(f"\n{banner} banned {full_stage_name}")
             print("The draft has been concluded.")
             # Clear the output after a delay
             await asyncio_sleep(10)
