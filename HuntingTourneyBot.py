@@ -36,6 +36,9 @@ def load_token(token_file: str = TOKEN_FILE) -> str:
 DRAFT_STATUS_FILE = "draft_status.txt"
 OUTPUT_DIR = ".output"
 
+# Maximum seed value in tourney mod config (32-bit int)
+MAX_SEED = 2**31 - 1
+
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -87,7 +90,6 @@ class DraftManager:
         self.waiting_for_ban2 = False
         self.ordered_stages = []
 
-        # Clear the text file
         self.clear_draft_status()
 
     def write_draft_status(self) -> bool:
@@ -294,7 +296,7 @@ class DraftManager:
         config = ConfigParser()
         config.optionxform = str  # type: ignore
         self._write_config_section(
-            config, "set", {"seed": str(randint(1, 1000000)), "ups": "True"}
+            config, "set", {"seed": str(randint(1, MAX_SEED)), "ups": "True"}
         )
         order_dict = {
             abbr: str(order_value) for stage_name, order_value, abbr in ordered_stages
