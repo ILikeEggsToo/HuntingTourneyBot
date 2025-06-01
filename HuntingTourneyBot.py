@@ -411,7 +411,6 @@ class MyClient(discord.Client):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.draft_manager = DraftManager()
-        self.draft_manager.clear_draft_status()
 
     async def on_ready(self) -> None:
         print(f"We have logged in as {self.user}")
@@ -428,6 +427,10 @@ class MyClient(discord.Client):
             # Command #1: !start <Runner Name 1> <Runner Name 2>
             if command == "start":
                 await self._handle_start_command(message, tokens)
+            # Command #2: !end
+            elif command == "end":
+                self.draft_manager.reset()
+                await message.channel.send("The draft has been reset.")
 
     async def _handle_start_command(
         self, message: discord.Message, tokens: List[str]
@@ -584,9 +587,6 @@ class MyClient(discord.Client):
             self.draft_manager.waiting_for_ban2 = False
             self.draft_manager.draft_active = False
             print("The draft has been concluded.")
-            # Clear the output after a delay
-            await asyncio_sleep(10)
-            self.draft_manager.clear_draft_status()
 
     async def process_ban1(self, full_stage_name: str) -> None:
         await self._process_ban(
