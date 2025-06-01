@@ -437,12 +437,10 @@ class MyClient(discord.Client):
     ) -> None:
         """Handle the !start command logic."""
         # Role Check
-        has_role = False
         for role in getattr(message.author, "roles", []):
             if role.name.lower() == "hunting drafter":
-                has_role = True
                 break
-        if not has_role:
+        else:
             await message.channel.send(
                 "You need the Hunting Drafter role to use this command."
             )
@@ -451,6 +449,11 @@ class MyClient(discord.Client):
         # Argument Validation
         if len(tokens) != 3:
             await message.channel.send("Usage: !start <Runner Name 1> <Runner Name 2>")
+            return
+
+        # Ensure runner names are less than 10 characters
+        if len(tokens[1]) >= 10 or len(tokens[2]) >= 10:
+            await message.channel.send("Runner names must be less than 10 characters long.")
             return
 
         # Draft Initialization
