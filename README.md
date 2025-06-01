@@ -10,6 +10,6 @@ Install the prerequisites:
 
 Build the executable:
 
-``pyinstaller --onefile SetAverage.py``
+``pyinstaller --onefile HuntingTourneyBot.py``
 
 If ``--onefile`` triggers your antivirus, try ``--onedir``. On occasion this has been known to happen, unsure why.
