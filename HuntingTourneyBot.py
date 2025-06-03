@@ -75,6 +75,7 @@ class DraftManager:
         self.waiting_for_ban2: bool = False
         self.console_input_thread: Optional[Thread] = None
         self.ordered_stages: List[Tuple[str, int, str]] = []
+        self.split_list: List[str] = []
         self.output_lines: List[str] = ["", "", ""]
 
     def reset(self) -> None:
@@ -89,6 +90,7 @@ class DraftManager:
         self.waiting_for_ban1 = False
         self.waiting_for_ban2 = False
         self.ordered_stages = []
+        self.split_list = []
 
         self.clear_draft_status()
 
@@ -168,12 +170,18 @@ class DraftManager:
         self, segments: Element, stage_order: List[str], total_splits: int
     ) -> None:
         """Add segments to the LiveSplit XML for each stage and split."""
+        self.split_list = []
+        # Create segments for each stage and split
         split_num = 1
         for stage in stage_order:
             for i in range(1, 6):  # 5 splits per stage
+                split_name = f"{stage} {i}"
+                self.split_list.append(split_name)
+                split_name += f" ({split_num}/{total_splits})"
+
                 segment = SubElement(segments, "Segment")
                 name = SubElement(segment, "Name")
-                name.text = f"{stage} {i} ({split_num}/{total_splits})"
+                name.text = split_name
                 split_num += 1
                 SubElement(segment, "Icon")
                 split_times = SubElement(segment, "SplitTimes")
@@ -586,6 +594,26 @@ class MyClient(discord.Client):
                         print("Successfully sent files individually")
                     except Exception as e2:
                         print(f"Error sending individual files: {str(e2)}")
+
+            # Send splits list to pacekeeping channel
+            if self.draft_manager.countdown_channel:
+                # TODO make this channel configurable
+                pacekeeping_channel = discord.utils.get(
+                    self.draft_manager.countdown_channel.guild.text_channels,
+                    name="⏰-pacekeeping",
+                )
+                if pacekeeping_channel:
+                    try:
+                        await pacekeeping_channel.send(
+                            "Here is the list of splits for the draft:",
+                        )
+                        await pacekeeping_channel.send(
+                            "\n".join(self.draft_manager.split_list)
+                        )
+                        print("Successfully sent splits list to pacekeeping channel")
+                    except Exception as e:
+                        print(f"Error sending splits list to pacekeeping channel: {str(e)}")
+
             # Reset the draft status
             self.draft_manager.waiting_for_ban2 = False
             self.draft_manager.draft_active = False
