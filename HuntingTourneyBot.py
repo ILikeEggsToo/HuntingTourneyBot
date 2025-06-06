@@ -461,7 +461,9 @@ class MyClient(discord.Client):
 
         # Ensure runner names are less than 10 characters
         if len(tokens[1]) >= 10 or len(tokens[2]) >= 10:
-            await message.channel.send("Runner names must be less than 10 characters long.")
+            await message.channel.send(
+                "Runner names must be less than 10 characters long."
+            )
             return
 
         # Draft Initialization
@@ -578,6 +580,11 @@ class MyClient(discord.Client):
                         ),
                         files=[discord.File(split_file), discord.File(config_file)],
                     )
+                    await self.draft_manager.countdown_channel.send(
+                        "After opening the splits file, please set Livesplit "
+                        "to compare against game time "
+                        "(right-click -> Compare Against -> Game Time)."
+                    )
                     print(
                         f"Successfully sent files to Discord: {split_file} and {config_file}"
                     )
@@ -612,7 +619,9 @@ class MyClient(discord.Client):
                         )
                         print("Successfully sent splits list to pacekeeping channel")
                     except Exception as e:
-                        print(f"Error sending splits list to pacekeeping channel: {str(e)}")
+                        print(
+                            f"Error sending splits list to pacekeeping channel: {str(e)}"
+                        )
 
             # Reset the draft status
             self.draft_manager.waiting_for_ban2 = False
